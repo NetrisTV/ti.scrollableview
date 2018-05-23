@@ -1,0 +1,18 @@
+#
+# this is your module manifest and used by Titanium
+# during compilation, packaging, distribution, etc.
+#
+version: 1.0.0
+apiversion: 4
+architectures: arm64-v8a armeabi-v7a x86
+description: ti.scrollableview
+author: Sergey Volkov <s.volkov@netris.ru>
+license: Apache 2.0
+copyright: Copyright (c) 2018 by by Netris, CJSC
+
+# these should not be edited
+name: ti.scrollableview
+moduleid: ru.netris.mobile.scrollableview
+guid: ca9ae9fa-8ac6-48ad-a67f-ade58af8034c
+platform: android
+minsdk: 7.3.0
