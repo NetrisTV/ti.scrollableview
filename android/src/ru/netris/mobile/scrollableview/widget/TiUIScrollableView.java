@@ -16,7 +16,6 @@ import org.appcelerator.titanium.TiC;
 import org.appcelerator.titanium.TiDimension;
 import org.appcelerator.titanium.proxy.TiViewProxy;
 import org.appcelerator.titanium.util.TiConvert;
-import org.appcelerator.titanium.util.TiEventHelper;
 import org.appcelerator.titanium.view.TiCompositeLayout;
 import org.appcelerator.titanium.view.TiUIView;
 
@@ -26,21 +25,15 @@ import ti.modules.titanium.ui.widget.listview.ListItemProxy;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.os.Build;
 import android.os.Parcelable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.DisplayMetrics;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewParent;
-import android.view.View.MeasureSpec;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.FrameLayout;
 
 @SuppressLint("NewApi")
 public class TiUIScrollableView extends TiUIView
@@ -54,7 +47,8 @@ public class TiUIScrollableView extends TiUIView
 	private final ArrayList<TiViewProxy> mViews;
 	private final ViewPagerAdapter mAdapter;
 	private final TiViewPagerLayout mContainer;
-	private final FrameLayout mPagingControl;
+	private final String defaultMargin = "39dp";
+	private InkPageIndicator mPagerIndicator;
 
 	private int mCurIndex = 0;
 	private boolean mEnabled = true;
@@ -75,12 +69,10 @@ public class TiUIScrollableView extends TiUIView
 		mViews = new ArrayList<TiViewProxy>();
 		mAdapter = new ViewPagerAdapter(activity, mViews);
 		mPager = buildViewPager(activity, mAdapter);
-		mContainer.addView(mPager, new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-
-		// Add paging controls to container.
-		mPagingControl = buildPagingControl(activity);
-		mContainer.addView(mPagingControl,
-						   new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+		TiCompositeLayout.LayoutParams params = new TiCompositeLayout.LayoutParams();
+		params.autoFillsHeight = true;
+		params.autoFillsWidth = true;
+		mContainer.addView(mPager, params);
 
 		setNativeView(mContainer);
 	}
@@ -295,73 +287,35 @@ public class TiUIScrollableView extends TiUIView
 		}
 	}
 
-	private FrameLayout buildPagingControl(Context context)
+	private void buildPagingControl()
 	{
-		// Validate argument.
-		if (context == null) {
-			return null;
+		Activity activity = proxy.getActivity();
+		if (activity == null) {
+			return;
 		}
-
-		// Calculate a density scaled left/right arrow size.
-		int arrowSizeInPixels = 24;
-		if (context.getResources() != null) {
-			DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-			if ((metrics != null) && (metrics.density >= 0.5f)) {
-				arrowSizeInPixels = (int) ((float) arrowSizeInPixels * metrics.density);
-			}
+		mPagerIndicator = new InkPageIndicator(activity);
+		TiCompositeLayout.LayoutParams params = new TiCompositeLayout.LayoutParams();
+		params.autoFillsHeight = false;
+		params.autoFillsWidth = true;
+		Boolean controlOnTop =
+			TiConvert.toBoolean(proxy.getProperty(ScrollableViewProxy.PROPERTY_PAGING_CONTROL_ON_TOP));
+		if (controlOnTop) {
+			params.optionTop = TiConvert.toTiDimension(defaultMargin, TiDimension.TYPE_TOP);
+			params.optionBottom = null;
+		} else {
+			params.optionTop = null;
+			params.optionBottom = TiConvert.toTiDimension(defaultMargin, TiDimension.TYPE_BOTTOM);
 		}
-
-		// Create an overlay view that will display the page controls.
-		FrameLayout layout = new FrameLayout(context);
-		layout.setFocusable(false);
-		layout.setFocusableInTouchMode(false);
-
-		// Add left arrow button to overlay.
-		TiArrowView leftArrow = new TiArrowView(context);
-		leftArrow.setVisibility(View.INVISIBLE);
-		leftArrow.setId(PAGE_LEFT_ID);
-		leftArrow.setMinimumWidth(arrowSizeInPixels);
-		leftArrow.setMinimumHeight(arrowSizeInPixels);
-		leftArrow.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v)
-			{
-				if (mEnabled) {
-					movePrevious();
-				}
-			}
-		});
-		FrameLayout.LayoutParams leftLayoutParams =
-			new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-		leftLayoutParams.gravity = Gravity.LEFT | Gravity.CENTER_VERTICAL;
-		layout.addView(leftArrow, leftLayoutParams);
-
-		// Add right arrow button to overlay.
-		TiArrowView rightArrow = new TiArrowView(context);
-		rightArrow.setLeft(false);
-		rightArrow.setVisibility(View.INVISIBLE);
-		rightArrow.setId(PAGE_RIGHT_ID);
-		rightArrow.setMinimumWidth(arrowSizeInPixels);
-		rightArrow.setMinimumHeight(arrowSizeInPixels);
-		rightArrow.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v)
-			{
-				if (mEnabled) {
-					moveNext();
-				}
-			}
-		});
-		FrameLayout.LayoutParams rightLayoutParams =
-			new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-		rightLayoutParams.gravity = Gravity.RIGHT | Gravity.CENTER_VERTICAL;
-		layout.addView(rightArrow, rightLayoutParams);
-
-		// Hide this overlay by default. Will be shown if Titanium "showPagingControl" is set true.
-		layout.setVisibility(View.GONE);
-
-		// Return the newly created overlay view.
-		return layout;
+		if (proxy.hasPropertyAndNotNull(ScrollableViewProxy.PROPERTY_PAGE_INDICATOR_COLOR)) {
+			mPagerIndicator.setPageIndicatorColor(
+				TiConvert.toColor((String) proxy.getProperty(ScrollableViewProxy.PROPERTY_PAGE_INDICATOR_COLOR)));
+		}
+		if (proxy.hasPropertyAndNotNull(ScrollableViewProxy.PROPERTY_CURRENT_PAGE_INDICATOR_COLOR)) {
+			mPagerIndicator.setCurrentPageIndicatorColor(TiConvert.toColor(
+				(String) proxy.getProperty(ScrollableViewProxy.PROPERTY_CURRENT_PAGE_INDICATOR_COLOR)));
+		}
+		mContainer.addView(mPagerIndicator, params);
+		mPagerIndicator.setViewPager(mPager);
 	}
 
 	@Override
@@ -417,8 +371,43 @@ public class TiUIScrollableView extends TiUIView
 			mPager.setOverScrollMode(TiConvert.toInt(newValue, View.OVER_SCROLL_ALWAYS));
 		} else if (TiC.PROPERTY_CACHE_SIZE.equals(key)) {
 			setPageCacheSize(TiConvert.toInt(newValue));
+		} else if (ScrollableViewProxy.PROPERTY_PAGING_CONTROL_ON_TOP.equals(key)) {
+			setPagingControlPosition(TiConvert.toBoolean(newValue));
+		} else if (ScrollableViewProxy.PROPERTY_PAGE_INDICATOR_COLOR.equals(key)) {
+			setPageIndicatorColor(TiConvert.toColor((String) newValue));
+		} else if (ScrollableViewProxy.PROPERTY_CURRENT_PAGE_INDICATOR_COLOR.equals(key)) {
+			setCurrentPageIndicatorColor(TiConvert.toColor((String) newValue));
 		} else {
 			super.propertyChanged(key, oldValue, newValue, proxy);
+		}
+	}
+
+	private void setPagingControlPosition(boolean onTop)
+	{
+		if (mPagerIndicator != null) {
+			TiCompositeLayout.LayoutParams params = (TiCompositeLayout.LayoutParams) mPagerIndicator.getLayoutParams();
+			if (onTop) {
+				params.optionTop = TiConvert.toTiDimension(defaultMargin, TiDimension.TYPE_TOP);
+				params.optionBottom = null;
+			} else {
+				params.optionTop = null;
+				params.optionBottom = TiConvert.toTiDimension(defaultMargin, TiDimension.TYPE_BOTTOM);
+			}
+			mPagerIndicator.setLayoutParams(params);
+		}
+	}
+
+	private void setPageIndicatorColor(int color)
+	{
+		if (mPagerIndicator != null) {
+			mPagerIndicator.setPageIndicatorColor(color);
+		}
+	}
+
+	private void setCurrentPageIndicatorColor(int color)
+	{
+		if (mPagerIndicator != null) {
+			mPagerIndicator.setCurrentPageIndicatorColor(color);
 		}
 	}
 
@@ -514,26 +503,20 @@ public class TiUIScrollableView extends TiUIView
 		}
 	}
 
-	public void showPager()
+	private void showPager()
 	{
-		View v = null;
-		v = mContainer.findViewById(PAGE_LEFT_ID);
-		if (v != null) {
-			v.setVisibility(mCurIndex > 0 ? View.VISIBLE : View.INVISIBLE);
+		if (mPagerIndicator == null) {
+			buildPagingControl();
 		}
-
-		v = mContainer.findViewById(PAGE_RIGHT_ID);
-		if (v != null) {
-			v.setVisibility(mCurIndex < (mViews.size() - 1) ? View.VISIBLE : View.INVISIBLE);
-		}
-
-		mPagingControl.setVisibility(View.VISIBLE);
-		((ScrollableViewProxy) proxy).setPagerTimeout();
+		mPagerIndicator.setVisibility(View.VISIBLE);
 	}
 
-	public void hidePager()
+	private void hidePager()
 	{
-		mPagingControl.setVisibility(View.INVISIBLE);
+		if (mPagerIndicator == null) {
+			return;
+		}
+		mPagerIndicator.setVisibility(View.INVISIBLE);
 	}
 
 	public void moveNext()
@@ -799,7 +782,7 @@ public class TiUIScrollableView extends TiUIView
 		}
 	}
 
-	private class TiViewPagerLayout extends FrameLayout
+	private class TiViewPagerLayout extends TiCompositeLayout
 	{
 		public TiViewPagerLayout(Context context)
 		{
@@ -835,9 +818,6 @@ public class TiUIScrollableView extends TiUIView
 		public boolean onTrackballEvent(MotionEvent event)
 		{
 			// Any trackball activity should show the pager.
-			if (shouldShowPager() && mPagingControl.getVisibility() != View.VISIBLE) {
-				showPager();
-			}
 			return super.onTrackballEvent(event);
 		}
 

@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.heinrichreimersoftware.materialintro.view;
+package ru.netris.mobile.scrollableview.widget;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.database.DataSetObserver;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -33,8 +32,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.Interpolator;
 
-import com.heinrichreimersoftware.materialintro.R;
-import com.heinrichreimersoftware.materialintro.util.AnimUtils;
+import ru.netris.mobile.scrollableview.util.AnimUtils;
 
 import java.util.Arrays;
 
@@ -59,8 +57,6 @@ public class InkPageIndicator extends View implements ViewPager.OnPageChangeList
 	private int dotDiameter;
 	private int gap;
 	private long animDuration;
-	private int unselectedColour;
-	private int selectedColour;
 
 	// derived from attributes
 	private float dotRadius;
@@ -128,24 +124,17 @@ public class InkPageIndicator extends View implements ViewPager.OnPageChangeList
 
 		final int density = (int) context.getResources().getDisplayMetrics().density;
 
-		// Load attributes
-		final TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.InkPageIndicator, defStyle, 0);
-
-		dotDiameter = a.getDimensionPixelSize(R.styleable.InkPageIndicator_dotDiameter, DEFAULT_DOT_SIZE * density);
+		dotDiameter = DEFAULT_DOT_SIZE * density;
 		dotRadius = dotDiameter / 2;
 		halfDotRadius = dotRadius / 2;
-		gap = a.getDimensionPixelSize(R.styleable.InkPageIndicator_dotGap, DEFAULT_GAP * density);
-		animDuration = (long) a.getInteger(R.styleable.InkPageIndicator_animationDuration, DEFAULT_ANIM_DURATION);
+		gap = DEFAULT_GAP * density;
+		animDuration = DEFAULT_ANIM_DURATION;
 		animHalfDuration = animDuration / 2;
-		unselectedColour = a.getColor(R.styleable.InkPageIndicator_pageIndicatorColor, DEFAULT_UNSELECTED_COLOUR);
-		selectedColour = a.getColor(R.styleable.InkPageIndicator_currentPageIndicatorColor, DEFAULT_SELECTED_COLOUR);
-
-		a.recycle();
 
 		unselectedPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		unselectedPaint.setColor(unselectedColour);
+		unselectedPaint.setColor(DEFAULT_UNSELECTED_COLOUR);
 		selectedPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		selectedPaint.setColor(selectedColour);
+		selectedPaint.setColor(DEFAULT_SELECTED_COLOUR);
 		interpolator = AnimUtils.getFastOutSlowInInterpolator(context);
 
 		// create paths & rect now – reuse & rewind later
@@ -709,6 +698,9 @@ public class InkPageIndicator extends View implements ViewPager.OnPageChangeList
 
 	private void setDotRevealFraction(int dot, float fraction)
 	{
+		if (dotRevealFractions.length - 1 <= dot) {
+			return;
+		}
 		dotRevealFractions[dot] = fraction;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
 			postInvalidateOnAnimation();

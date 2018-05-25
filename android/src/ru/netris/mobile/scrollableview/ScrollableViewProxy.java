@@ -7,7 +7,6 @@
 package ru.netris.mobile.scrollableview;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.appcelerator.kroll.KrollDict;
@@ -17,7 +16,6 @@ import org.appcelerator.kroll.common.Log;
 import org.appcelerator.kroll.common.TiMessenger;
 import org.appcelerator.titanium.TiC;
 import org.appcelerator.titanium.proxy.TiViewProxy;
-import org.appcelerator.titanium.util.TiConvert;
 import org.appcelerator.titanium.view.TiUIView;
 
 import ru.netris.mobile.scrollableview.widget.TiUIScrollableView;
@@ -26,6 +24,9 @@ import android.os.Message;
 // clang-format off
 @Kroll.proxy(creatableInModule = TiScrollableviewModule.class,
 	propertyAccessors = {
+		ScrollableViewProxy.PROPERTY_PAGING_CONTROL_ON_TOP,
+		ScrollableViewProxy.PROPERTY_PAGE_INDICATOR_COLOR,
+		ScrollableViewProxy.PROPERTY_CURRENT_PAGE_INDICATOR_COLOR,
 		TiC.PROPERTY_CACHE_SIZE,
 		TiC.PROPERTY_SHOW_PAGING_CONTROL,
 		TiC.PROPERTY_OVER_SCROLL_MODE
@@ -48,6 +49,10 @@ public class ScrollableViewProxy extends TiViewProxy
 	public static final int MSG_INSERT_VIEWS_AT = MSG_FIRST_ID + 110;
 	public static final int MSG_LAST_ID = MSG_FIRST_ID + 999;
 
+	public static final String PROPERTY_PAGING_CONTROL_ON_TOP = "pagingControlOnTop";
+	public static final String PROPERTY_PAGE_INDICATOR_COLOR = "pageIndicatorColor";
+	public static final String PROPERTY_CURRENT_PAGE_INDICATOR_COLOR = "currentPageIndicatorColor";
+
 	private static final int DEFAULT_PAGING_CONTROL_TIMEOUT = 3000;
 	public static final int MIN_CACHE_SIZE = 3;
 
@@ -57,6 +62,7 @@ public class ScrollableViewProxy extends TiViewProxy
 	{
 		super();
 		inScroll = new AtomicBoolean(false);
+		defaultValues.put(PROPERTY_PAGING_CONTROL_ON_TOP, false);
 		defaultValues.put(TiC.PROPERTY_CACHE_SIZE, MIN_CACHE_SIZE);
 		defaultValues.put(TiC.PROPERTY_SHOW_PAGING_CONTROL, false);
 		defaultValues.put(TiC.PROPERTY_OVER_SCROLL_MODE, 0);
@@ -78,12 +84,6 @@ public class ScrollableViewProxy extends TiViewProxy
 		boolean handled = false;
 		TiUIScrollableView view = getView();
 		switch (msg.what) {
-			case MSG_HIDE_PAGER:
-				if (view != null) {
-					view.hidePager();
-					handled = true;
-				}
-				break;
 			case MSG_MOVE_PREV:
 				if (view != null) {
 					inScroll.set(true);
@@ -260,21 +260,6 @@ public class ScrollableViewProxy extends TiViewProxy
 		getMainHandler().sendEmptyMessage(MSG_MOVE_NEXT);
 	}
 
-	public void setPagerTimeout()
-	{
-		getMainHandler().removeMessages(MSG_HIDE_PAGER);
-
-		int timeout = DEFAULT_PAGING_CONTROL_TIMEOUT;
-		Object o = getProperty(TiC.PROPERTY_PAGING_CONTROL_TIMEOUT);
-		if (o != null) {
-			timeout = TiConvert.toInt(o);
-		}
-
-		if (timeout > 0) {
-			getMainHandler().sendEmptyMessageDelayed(MSG_HIDE_PAGER, timeout);
-		}
-	}
-
 	public void fireDragEnd(int currentPage, TiViewProxy currentView)
 	{
 		if (hasListeners(TiC.EVENT_DRAGEND)) {
@@ -361,7 +346,6 @@ public class ScrollableViewProxy extends TiViewProxy
 	@Override
 	public void releaseViews()
 	{
-		getMainHandler().removeMessages(MSG_HIDE_PAGER);
 		super.releaseViews();
 	}
 

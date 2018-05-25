@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.heinrichreimersoftware.materialintro.util;
+package ru.netris.mobile.scrollableview.util;
 
 import android.content.Context;
 import android.os.Build;
@@ -23,8 +23,6 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
-
-import com.heinrichreimersoftware.materialintro.R;
 
 /**
  * Utility methods for working with animations.
@@ -48,12 +46,5 @@ public class AnimUtils
 			}
 		}
 		return fastOutSlowIn;
-	}
-
-	public static void applyShakeAnimation(Context context, View view)
-	{
-		Animation shake;
-		shake = AnimationUtils.loadAnimation(context, R.anim.mi_shake);
-		view.startAnimation(shake);
 	}
 }
