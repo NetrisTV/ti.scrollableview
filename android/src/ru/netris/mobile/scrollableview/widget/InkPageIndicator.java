@@ -107,6 +107,7 @@ public class InkPageIndicator extends View implements ViewPager.OnPageChangeList
 	float controlY2;
 
 	private boolean measured = false;
+	private ValueAnimator lastValueAnimator;
 
 	public InkPageIndicator(Context context)
 	{
@@ -228,6 +229,11 @@ public class InkPageIndicator extends View implements ViewPager.OnPageChangeList
 
 	private void setPageCount(int pages)
 	{
+		if (pageCount != pages) {
+			if (lastValueAnimator != null && (lastValueAnimator.isStarted() || lastValueAnimator.isRunning())) {
+				lastValueAnimator.cancel();
+			}
+		}
 		pageCount = pages;
 		calculateDotPositions(getWidth(), getHeight());
 		resetState();
@@ -611,9 +617,11 @@ public class InkPageIndicator extends View implements ViewPager.OnPageChangeList
 		// retreat animations when it has moved 75% of the way.
 		// The retreat animation in turn will kick of reveal anims when the
 		// retreat has passed any dots to be revealed
-		if (getVisibility() == VISIBLE)
-			createMoveSelectedAnimator(dotCenterX[now], previousPage, now, steps)
-				.start(); // dotCenterX is null when getVisibility() != VISIBLE
+		if (getVisibility() == VISIBLE) {
+			// dotCenterX is null when getVisibility() != VISIBLE
+			lastValueAnimator = createMoveSelectedAnimator(dotCenterX[now], previousPage, now, steps);
+			lastValueAnimator.start();
+		}
 	}
 
 	private ValueAnimator createMoveSelectedAnimator(final float moveTo, int was, int now, int steps)
