@@ -4,7 +4,7 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
-package ti.modules.titanium.ui.widget;
+package ru.netris.mobile.scrollableview.widget;
 
 import java.util.ArrayList;
 import java.lang.Math;
@@ -20,7 +20,7 @@ import org.appcelerator.titanium.util.TiEventHelper;
 import org.appcelerator.titanium.view.TiCompositeLayout;
 import org.appcelerator.titanium.view.TiUIView;
 
-import ti.modules.titanium.ui.ScrollableViewProxy;
+import ru.netris.mobile.scrollableview.ScrollableViewProxy;
 import ti.modules.titanium.ui.widget.listview.ListItemProxy;
 
 import android.annotation.SuppressLint;

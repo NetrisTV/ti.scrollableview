@@ -4,7 +4,7 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
-package ti.modules.titanium.ui;
+package ru.netris.mobile.scrollableview;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,11 +20,11 @@ import org.appcelerator.titanium.proxy.TiViewProxy;
 import org.appcelerator.titanium.util.TiConvert;
 import org.appcelerator.titanium.view.TiUIView;
 
-import ti.modules.titanium.ui.widget.TiUIScrollableView;
+import ru.netris.mobile.scrollableview.widget.TiUIScrollableView;
 import android.app.Activity;
 import android.os.Message;
 // clang-format off
-@Kroll.proxy(creatableInModule = UIModule.class,
+@Kroll.proxy(creatableInModule = TiScrollableviewModule.class,
 	propertyAccessors = {
 		TiC.PROPERTY_CACHE_SIZE,
 		TiC.PROPERTY_SHOW_PAGING_CONTROL,
