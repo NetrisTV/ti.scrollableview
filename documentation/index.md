@@ -24,7 +24,7 @@ enabled, by default it appears as small dots on the bottom of the screen.
 ## Difference from original module
 
 ### Missing Properties for Android
-This missing properties (in original [Ti.UI.ScrollView](https://docs.appcelerator.com/platform/latest/#!/api/Titanium.UI.ScrollView) on Android), were
+This missing properties (in original [Ti.UI.ScrollableView](https://docs.appcelerator.com/platform/latest/#!/api/Titanium.UI.ScrollableView) on Android), were
 implemented:
 
 #### clipViews
@@ -58,7 +58,7 @@ type: String
 default: undefined (white)
 
 ### Additional properties
-This properties don't exists in [Ti.UI.ScrollView](https://docs.appcelerator.com/platform/latest/#!/api/Titanium.UI.ScrollView):
+This properties don't exists in [Ti.UI.ScrollableView](https://docs.appcelerator.com/platform/latest/#!/api/Titanium.UI.ScrollableView):
 
 #### padding
 Sets the padding of this ScrollableView.

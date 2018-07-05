@@ -5,16 +5,17 @@ ScrollableView is a view that encapsulates a horizontally-scrolling set of child
 known as pages, navigable using its built-in horizontal swipe gestures.
 
 This module implements this missing properies of Android version of
-[Ti.UI.ScrollView](https://docs.appcelerator.com/platform/latest/#!/api/Titanium.UI.ScrollView):
+[Ti.UI.ScrollableView](https://docs.appcelerator.com/platform/latest/#!/api/Titanium.UI.ScrollableView):
 * clipViews
 * currentPageIndicatorColor
 * pagingControlOnTop
 * pageIndicatorColor
+
 See [documentation](documentation/index.md) for more information.
 
 Also it provides nice-looking `ink page indicator` aka paging control.
 
-![](demo.webm)
+![](demo.gif)
 
 ## Installation
 
