@@ -9,6 +9,7 @@ package ru.netris.mobile.scrollableview.widget;
 import java.util.ArrayList;
 import java.lang.Math;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.kroll.KrollProxy;
@@ -22,6 +23,7 @@ import org.appcelerator.titanium.view.TiCompositeLayout;
 import org.appcelerator.titanium.view.TiUIView;
 
 import ru.netris.mobile.scrollableview.ScrollableViewProxy;
+import ru.netris.mobile.scrollableview.TiScrollableviewModule;
 import ti.modules.titanium.ui.ViewProxy;
 import ti.modules.titanium.ui.widget.TiView;
 import ti.modules.titanium.ui.widget.listview.ListItemProxy;
@@ -72,6 +74,9 @@ public class TiUIScrollableView extends TiUIView
 		mNewViews = new ArrayList<Object>();
 		mAdapter = new ViewPagerAdapter(activity, mViews, mNewViews);
 		mPager = buildViewPager(activity, mAdapter);
+		if (proxy.hasPropertyAndNotNull(TiScrollableviewModule.PROPERTY_CLIP_VIEWS)) {
+			mPager.setClipToPadding(TiConvert.toBoolean(proxy.getProperty(TiScrollableviewModule.PROPERTY_CLIP_VIEWS)));
+		}
 		TiCompositeLayout.LayoutParams params = new TiCompositeLayout.LayoutParams();
 		params.autoFillsHeight = true;
 		params.autoFillsWidth = true;
@@ -359,6 +364,10 @@ public class TiUIScrollableView extends TiUIView
 			setPageCacheSize(TiConvert.toInt(d.get(TiC.PROPERTY_CACHE_SIZE)));
 		}
 
+		if (d.containsKey(TiC.PROPERTY_PADDING)) {
+			setPadding((HashMap) d.get(TiC.PROPERTY_PADDING));
+		}
+
 		super.processProperties(d);
 	}
 
@@ -392,9 +401,37 @@ public class TiUIScrollableView extends TiUIView
 			setPageIndicatorColor(TiConvert.toColor((String) newValue));
 		} else if (ScrollableViewProxy.PROPERTY_CURRENT_PAGE_INDICATOR_COLOR.equals(key)) {
 			setCurrentPageIndicatorColor(TiConvert.toColor((String) newValue));
+		} else if (key.equals(TiC.PROPERTY_PADDING)) {
+			setPadding((HashMap) newValue);
 		} else {
 			super.propertyChanged(key, oldValue, newValue, proxy);
 		}
+	}
+
+	private void setPadding(HashMap<String, Object> d)
+	{
+		int paddingLeft = mPager.getPaddingLeft();
+		int paddingRight = mPager.getPaddingRight();
+		int paddingTop = mPager.getPaddingTop();
+		int paddingBottom = mPager.getPaddingBottom();
+
+		if (d.containsKey(TiC.PROPERTY_LEFT)) {
+			paddingLeft = TiConvert.toInt(d.get(TiC.PROPERTY_LEFT), 0);
+		}
+
+		if (d.containsKey(TiC.PROPERTY_RIGHT)) {
+			paddingRight = TiConvert.toInt(d.get(TiC.PROPERTY_RIGHT), 0);
+		}
+
+		if (d.containsKey(TiC.PROPERTY_TOP)) {
+			paddingTop = TiConvert.toInt(d.get(TiC.PROPERTY_TOP), 0);
+		}
+
+		if (d.containsKey(TiC.PROPERTY_BOTTOM)) {
+			paddingBottom = TiConvert.toInt(d.get(TiC.PROPERTY_BOTTOM), 0);
+		}
+
+		mPager.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
 	}
 
 	private void setPagingControlPosition(boolean onTop)

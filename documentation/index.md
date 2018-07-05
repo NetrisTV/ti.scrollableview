@@ -23,9 +23,24 @@ enabled, by default it appears as small dots on the bottom of the screen.
 
 ## Difference from original module
 
-### Properties
-This missing properties (in original Ti.UI.ScrollView on Android), were
+### Missing Properties for Android
+This missing properties (in original [Ti.UI.ScrollView](https://docs.appcelerator.com/platform/latest/#!/api/Titanium.UI.ScrollView) on Android), were
 implemented:
+
+#### clipViews
+Determines whether the previous and next pages are clipped, so that they are not visible
+adjacent to the current page.
+Set to `false` to allow the previous or next pages to be seen. Note that
+ScrollableView's [padding](#padding) must be set in order to make this property effective.
+
+type: Boolean
+
+#### currentPageIndicatorColor
+Color for the current page of the paging control, as a color name or hex triplet.
+For information about color values, see the "Colors" section of [Titanium.UI](https://docs.appcelerator.com/platform/latest/#!/api/Titanium.UI).
+type: String
+
+default: undefined (50% white)
 
 #### pagingControlOnTop
 Determines whether the paging control is displayed at the top or bottom of the view.
@@ -36,17 +51,19 @@ type: Boolean
 default: false
 #### pageIndicatorColor
 Color of the paging control, as a color name or hex triplet.
-For information about color values, see the "Colors" section of <Titanium.UI>.
+For information about color values, see the "Colors" section of [Titanium.UI](https://docs.appcelerator.com/platform/latest/#!/api/Titanium.UI).
 
 type: String
 
 default: undefined (white)
-#### currentPageIndicatorColor
-Color for the current page of the paging control, as a color name or hex triplet.
-For information about color values, see the "Colors" section of <Titanium.UI>.
-type: String
 
-default: undefined (50% white)
+### Additional properties
+This properties don't exists in [Ti.UI.ScrollView](https://docs.appcelerator.com/platform/latest/#!/api/Titanium.UI.ScrollView):
+
+#### padding
+Sets the padding of this ScrollableView.
+
+type: [TextFieldPadding](https://docs.appcelerator.com/platform/latest/#!/api/TextFieldPadding)
 
 ## Usage
 
