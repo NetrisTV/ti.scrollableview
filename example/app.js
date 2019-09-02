@@ -1,6 +1,6 @@
 var win = Ti.UI.createWindow({
   title: 'ScrollableView',
-  backgroundColor:'#eee'
+  backgroundColor:'#000'
 });
 
 var label = Ti.UI.createLabel();
@@ -9,6 +9,9 @@ win.open();
 
 // Common params
 var params = {
+  backgroundColor: '#fff',
+  height: Ti.UI.SIZE,
+  cacheSize: 3,
   clipViews: false,
   currentPageIndicatorColor: '#000',
   pageIndicatorColor: '#f00',
@@ -33,9 +36,11 @@ if (Ti.Platform.name === 'android') {
   scrollableView = Titanium.UI.createScrollableView(params);
 }
 
-var view1 = Ti.UI.createView({ id: 'view1', backgroundColor: '#836' });
-var view2 = Ti.UI.createView({ id: 'view2', backgroundColor: '#246' });
-var view3 = Ti.UI.createView({ id: 'view3', backgroundColor: '#48b' });
-scrollableView.setViews([view1, view2, view3]);
+var view1 = Ti.UI.createView({ id: 'view1', backgroundColor: '#836', height: '200' });
+var view2 = Ti.UI.createView({ id: 'view2', backgroundColor: '#246', height: '180' });
+var view3 = Ti.UI.createView({ id: 'view3', backgroundColor: '#48b', height: '160' });
+var view4 = Ti.UI.createView({ id: 'view3', backgroundColor: '#b84', height: '140' });
+var view5 = Ti.UI.createView({ id: 'view3', backgroundColor: '#8b4', height: '120' });
+scrollableView.setViews([view1, view2, view3, view4, view5]);
 
 win.add(scrollableView);
