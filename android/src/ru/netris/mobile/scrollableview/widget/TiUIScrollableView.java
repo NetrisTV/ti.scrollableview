@@ -78,8 +78,8 @@ public class TiUIScrollableView extends TiUIView
 			mPager.setClipToPadding(TiConvert.toBoolean(proxy.getProperty(TiScrollableviewModule.PROPERTY_CLIP_VIEWS)));
 		}
 		TiCompositeLayout.LayoutParams params = new TiCompositeLayout.LayoutParams();
-		params.autoFillsHeight = true;
-		params.autoFillsWidth = true;
+		params.autoFillsHeight = false;
+		params.autoFillsWidth = false;
 		mContainer.addView(mPager, params);
 
 		setNativeView(mContainer);
